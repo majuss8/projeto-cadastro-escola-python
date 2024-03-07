@@ -1,0 +1,145 @@
+from escola import Escola
+from aluno import Aluno
+from tkinter import * 
+from tkinter import ttk, messagebox
+
+class App:
+    def __init__(self, nome: str, endereco: str):
+        self.escola = Escola(nome, endereco)
+        self.janela = Tk()
+        self.janela.title(f"Sistema - {self.escola.nome}")
+
+        # Label
+        self.label_matricula = Label(self.janela, text='Matricula',
+                                     font='Tahoma 14 bold', fg='green')
+        self.label_matricula.grid(row=1, column=0)
+
+        # Entry
+        self.txt_matricula = Entry(self.janela, font='Tahoma 14',
+                                   width=27, state=DISABLED)
+        self.txt_matricula.grid(row=1, column=1)
+
+        # Label
+        self.label_nome = Label(self.janela, text='Nome',
+                                     font='Tahoma 14 bold', fg='green')
+        self.label_nome.grid(row=2, column=0)
+
+        # Entry
+        self.txt_nome = Entry(self.janela, font='Tahoma 14',
+                                   width=27)
+        self.txt_nome.grid(row=2, column=1)
+
+        # Label
+        self.label_idade = Label(self.janela, text='Idade',
+                                     font='Tahoma 14 bold', fg='green')
+        self.label_idade.grid(row=3, column=0)
+
+        # Entry
+        self.txt_idade = Entry(self.janela, font='Tahoma 14',
+                                   width=27)
+        self.txt_idade.grid(row=3, column=1)
+
+        # Label
+        self.label_curso = Label(self.janela, text='Curso',
+                                     font='Tahoma 14 bold', fg='green')
+        self.label_curso.grid(row=4, column=0)
+
+        self.combo_curso = ttk.Combobox(self.janela,
+                                        font='Tahoma 14 bold',
+                                        values=['Java', 'Python',
+                                                'Javascript', 'Node'],
+                                                width=21, state='readonly')
+
+        self.combo_curso.grid(row=4, column=1)
+
+        # Label
+        self.label_nota = Label(self.janela, text='Nota',
+                                     font='Tahoma 14 bold', fg='green')
+        self.label_nota.grid(row=5, column=0)
+
+        # Entry
+        self.txt_nota = Entry(self.janela, font='Tahoma 14',
+                                   width=27)
+        self.txt_nota.grid(row=5, column=1)
+
+        self.btn_adicionar = Button(self.janela, text='Adicionar',
+                                    font='Tahoma 12 bold', width=7,
+                                    fg='green',
+                                    command=self.addAluno)
+        self.btn_adicionar.grid(row=7, column=0)
+
+        self.btn_editar = Button(self.janela, text='Editar',
+                                    font='Tahoma 12 bold', width=7,
+                                    fg='purple',
+                                    command=self.editAluno)
+        self.btn_editar.grid(row=7, column=1)
+
+        self.btn_excluir = Button(self.janela, text='Excluir',
+                                    font='Tahoma 12 bold', width=7,
+                                    fg='red',
+                                    command=self.delAluno)
+        self.btn_excluir.grid(row=7, column=2)
+
+        self.frame = Frame(self.janela)
+        self.frame.grid(row=8, column=0, columnspan=3)
+        self.colunas = ['Matricula', 'Nome', 'Idade', 'Curso', 'Nota']
+        self.tabela = ttk.Treeview(self.frame, columns=self.colunas,
+                                   show='headings')
+        for coluna in self.colunas:
+            self.tabela.heading(coluna, text=coluna)
+            self.tabela.column(coluna, width=110)
+        self.tabela.pack()
+
+        # resizable
+
+        self.atualizarTabela()
+
+        self.janela.mainloop()
+
+    def atualizarTabela(self):
+        # limpar a tabela
+        for linha in self.tabela.get_children():
+            self.tabela.delete(linha)
+
+        for aluno in self.escola.alunos:
+            self.tabela.insert('', END, values=(aluno.matricula,
+                                                aluno.nome,
+                                                aluno.idade,
+                                                aluno.curso,
+                                                aluno.nota))
+
+    def criarAluno(self):
+        # factory
+        nome = self.txt_nome.get()
+        idade = int(self.txt_idade.get())
+        curso = self.combo_curso.get()
+        nota = float(self.txt_nota.get())
+        aluno = Aluno(nome, idade, curso, nota)
+        return aluno
+
+    def addAluno(self):
+        aluno = self.criarAluno()
+        self.escola.cadastrarAluno(aluno)
+        messagebox.showinfo('Sucesso!',
+                            'Aluno cadastrado com sucesso!')
+        self.atualizarTabela()
+        self.limparCampos()
+        
+    def limparCampos(self):
+        self.txt_matricula.config(state=NORMAL)
+        self.txt_matricula.delete(0, END)
+        self.txt_matricula.config(state=DISABLED)
+        self.txt_nome.delete(0, END)
+        self.txt_idade.delete(0, END)
+        self.combo_curso.set('')
+        self.txt_nota.delete(0, END)
+
+    def editAluno(self):
+        pass
+
+    def delAluno(self):
+        pass
+
+
+App('Infinity School', 'Av Santos Dumont')
+
