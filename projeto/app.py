@@ -88,8 +88,10 @@ class App:
         for coluna in self.colunas:
             self.tabela.heading(coluna, text=coluna)
             self.tabela.column(coluna, width=110)
-        self.tabela.pack()
 
+        # bind
+        self.tabela.bind('<ButtonRelease-1>', self.selecionarAluno)
+        self.tabela.pack()
         # resizable
 
         self.atualizarTabela()
@@ -107,6 +109,28 @@ class App:
                                                 aluno.idade,
                                                 aluno.curso,
                                                 aluno.nota))
+            
+    def limparCampos(self):
+        self.txt_matricula.config(state=NORMAL)
+        self.txt_matricula.delete(0, END)
+        self.txt_matricula.config(state=DISABLED)
+        self.txt_nome.delete(0, END)
+        self.txt_idade.delete(0, END)
+        self.combo_curso.set('')
+        self.txt_nota.delete(0, END)    
+
+    def selecionarAluno(self, event):
+        linha_selecionada = self.tabela.selection()[0]
+        item = self.tabela.item(linha_selecionada)['values']
+        self.limparCampos()
+        # Inserindo os valores
+        self.txt_matricula.config(state=NORMAL)
+        self.txt_matricula.insert(0, item[0])
+        self.txt_matricula.config(state=DISABLED)
+        self.txt_nome.insert(0, item[1])
+        self.txt_idade.insert(0, item[2])
+        self.combo_curso.set(item[3])
+        self.txt_nota.insert(0, item[4])
 
     def criarAluno(self):
         # factory
@@ -116,7 +140,7 @@ class App:
         nota = float(self.txt_nota.get())
         aluno = Aluno(nome, idade, curso, nota)
         return aluno
-
+    
     def addAluno(self):
         aluno = self.criarAluno()
         self.escola.cadastrarAluno(aluno)
@@ -124,21 +148,21 @@ class App:
                             'Aluno cadastrado com sucesso!')
         self.atualizarTabela()
         self.limparCampos()
-        
-    def limparCampos(self):
-        self.txt_matricula.config(state=NORMAL)
-        self.txt_matricula.delete(0, END)
-        self.txt_matricula.config(state=DISABLED)
-        self.txt_nome.delete(0, END)
-        self.txt_idade.delete(0, END)
-        self.combo_curso.set('')
-        self.txt_nota.delete(0, END)
 
     def editAluno(self):
-        pass
+        aluno = self.criarAluno()
+        aluno.matricula = self.txt_matricula.get()
+        self.escola.editarAluno(aluno)
+        self.limparCampos()
+        self.atualizarTabela()
+        messagebox.showinfo('Sucesso!', 'Dados alterados com sucesso!')
 
     def delAluno(self):
-        pass
+        matricula = self.txt_matricula.get()
+        self.escola.deletarAluno(matricula)
+        self.limparCampos()
+        self.atualizarTabela()
+        messagebox.showinfo('Sucesso!', 'Aluno excluido com sucesso!')        
 
 
 App('Infinity School', 'Av Santos Dumont')
